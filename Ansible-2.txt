@@ -1,0 +1,82 @@
+# Copy Directories 
+
+--- 
+- 
+  hosts: node1
+  name: play1
+  become: true
+  tasks: 
+    - 
+      copy: 
+        dest: /home/test_dir
+        src: test_dir/
+      name: "copy dir to remote host"
+======================================================================
+
+#Write text to file
+
+copy4.yml
+
+--- 
+- 
+  hosts: webservers
+  name: play1
+  become: true
+  tasks: 
+    - 
+      copy: 
+        content: "Hello , World!This is new text added from playbook,abcdefghij.\n"
+        dest: /home/ubuntu/test_file
+      name: "writing text in to remote file"
+
+========================================================================
+
+---
+- hosts: webservers
+  tasks:
+  - name: Ansible zip directory example
+    archive:
+     path:
+     - /home/test_dir
+     dest: /home/ubuntu/sam.zip
+     format: zip
+
+
+-----------------------------------------------------------------------------------
+Ansible File Module :
+
+#To check file is exist or not
+
+--- 
+- 
+  hosts: slave1
+  tasks: 
+    - 
+      name: "Ansible check file exists or not."
+      register: test
+      stat: 
+        path: /home/ubuntu/test_file5
+    - 
+      debug: 
+        msg: "The file test_file5 is  exists in the specified path."
+      when: test.stat.exists
+
+Note : use the file details retrieved by the stat module with the when argument to create conditions for running tasks
+
+# check file exist or not ,create file if doesn't exist
+
+---
+-
+  hosts: slave1
+  tasks:
+    -
+      name: "checking file exists or not  "
+      register: file_data
+      stat:
+        path: /home/ubuntu/test_file678
+    -
+      file:
+        path: /home/ubuntu/test_file678
+        state: touch
+      name: "create a file if does not exist  "
+      when: not file_data.stat.exists
